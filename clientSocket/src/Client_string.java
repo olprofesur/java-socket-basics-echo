@@ -1,39 +1,15 @@
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-class Command {
-    private String commandName;
-    private int par1;
-
-    public String getCommandName() {
-        return commandName;
-    }
-
-    public int getPar1() {
-        return par1;
-    }
-
-    public void setCommandName(String commandName) {
-        this.commandName = commandName;
-    }
-
-    public void setPar1(int par1) {
-        this.par1 = par1;
-    }
-}
-
-public class Client_json {
+public class Client_string {
 
     private Socket requestSocket;
     private PrintWriter out;
     private BufferedReader in;
     private String message;
-    ObjectMapper mapper = new ObjectMapper();
 
-    Client_json() {
+    Client_string() {
     }
 
     void run() {
@@ -45,21 +21,18 @@ public class Client_json {
             out = new PrintWriter(requestSocket.getOutputStream());
             out.flush();
             in = new BufferedReader(new InputStreamReader(requestSocket.getInputStream()));
-            Command objClient=null;
-            Command objServer=null;
             //3: Communicating with the server
             do {
                 try {
                     message = in.readLine();
-                    objServer = mapper.readValue(message, Command.class);
-                    System.out.println("server command>" + objServer.getCommandName());
-                    objClient=new Command();
-                    objClient.setCommandName("bye");
-                    sendMessage(mapper.writeValueAsString(objClient));
+                    System.out.println("server>" + message);
+                    sendMessage("Hi my server");
+                    message = "bye";
+                    sendMessage(message);
                 } catch (Exception classNot) {
                     System.err.println("data received in unknown format");
                 }
-            } while (objServer!=null&&!objServer.getCommandName().equals("bye"));
+            } while (message!=null&&!message.equals("bye"));
         } catch (UnknownHostException unknownHost) {
             System.err.println("You are trying to connect to an unknown host!");
         } catch (Exception ioException) {
@@ -78,11 +51,8 @@ public class Client_json {
 
     void sendMessage(String msg) {
         try {
-
-
-            PrintWriter pw = new PrintWriter(out);
-            pw.println(msg);
-            pw.flush();
+            out.println(msg);
+            out.flush();
             System.out.println("client>" + msg);
         } catch (Exception ioException) {
             ioException.printStackTrace();
@@ -90,7 +60,7 @@ public class Client_json {
     }
 
     public static void main(String args[]) {
-        Client_json client = new Client_json();
+        Client_string client = new Client_string();
         client.run();
     }
 }
