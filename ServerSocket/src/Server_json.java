@@ -1,15 +1,41 @@
-import java.io.*;
-import java.net.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class Server_string {
+import java.io.*;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+class Command {
+    private String commandName;
+    private int par1;
+
+    public String getCommandName() {
+        return commandName;
+    }
+
+    public int getPar1() {
+        return par1;
+    }
+
+    public void setCommandName(String commandName) {
+        this.commandName = commandName;
+    }
+
+    public void setPar1(int par1) {
+        this.par1 = par1;
+    }
+}
+
+
+public class Server_json {
 
     private ServerSocket providerSocket;
     private Socket connection = null;
-    private OutputStream out;
-    private InputStream in;
+    private PrintWriter out;
+    private BufferedReader in;
     private String message;
+    ObjectMapper mapper = new ObjectMapper();
 
-    Server_string() {
+    Server_json() {
     }
 
     void run() {
@@ -21,25 +47,26 @@ public class Server_string {
             connection = providerSocket.accept();
             System.out.println("Connection received from " + connection.getInetAddress().getHostName());
             //3. get Input and Output streams
-            out = connection.getOutputStream();
+            out = new PrintWriter(connection.getOutputStream());
             out.flush();
-            in = connection.getInputStream();
-            sendMessage("Connection successful");
-            //4. The two parts communicate via the input and output streams
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            Command objServer=new Command();
+            objServer.setCommandName("connection confirm");
+            sendMessage(mapper.writeValueAsString(objServer));
+            Command objClient=null;
+            //4. The two parts communicate via the input and output stream
             do {
                 try {
-
-					
-					BufferedReader bis = new BufferedReader(new InputStreamReader(in));
-					String message=bis.readLine();
-                    System.out.println("client>" + message);
-                    if (message.equals("bye")) {
-                        sendMessage("bye");
+					String message=in.readLine();
+                    objClient = mapper.readValue(message, Command.class);
+                    System.out.println("client>" + objClient.getCommandName());
+                    if (objClient.getCommandName().equals("bye")) {
+                        sendMessage(mapper.writeValueAsString(objClient));
                     }
-                } catch (Exception classnot) {
-                    System.err.println("Data received in unknown format");
+                } catch (Exception e) {
+                    System.err.println(e);
                 }
-            } while (message!=null&&!message.equals("bye"));
+            } while (objClient!=null&&!objClient.getCommandName().equals("bye"));
         } catch (IOException ioException) {
             ioException.printStackTrace();
         } finally {
@@ -66,9 +93,10 @@ public class Server_string {
     }
 
     public static void main(String args[]) {
-        Server_string server = new Server_string();
+        Server_json server = new Server_json();
         while (true) {
             server.run();
         }
     }
+
 }

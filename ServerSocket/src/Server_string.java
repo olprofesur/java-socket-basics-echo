@@ -5,8 +5,8 @@ public class Server_string {
 
     private ServerSocket providerSocket;
     private Socket connection = null;
-    private OutputStream out;
-    private InputStream in;
+    private PrintWriter out;
+    private BufferedReader in;
     private String message;
 
     Server_string() {
@@ -21,17 +21,14 @@ public class Server_string {
             connection = providerSocket.accept();
             System.out.println("Connection received from " + connection.getInetAddress().getHostName());
             //3. get Input and Output streams
-            out = connection.getOutputStream();
+            out = new PrintWriter(connection.getOutputStream());
             out.flush();
-            in = connection.getInputStream();
+            in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             sendMessage("Connection successful");
             //4. The two parts communicate via the input and output streams
             do {
                 try {
-
-					
-					BufferedReader bis = new BufferedReader(new InputStreamReader(in));
-					String message=bis.readLine();
+					String message=in.readLine();
                     System.out.println("client>" + message);
                     if (message.equals("bye")) {
                         sendMessage("bye");
@@ -56,9 +53,8 @@ public class Server_string {
 
     void sendMessage(String msg) {
         try {
-            PrintWriter pw = new PrintWriter(out);
-			pw.println(msg);
-            pw.flush();
+            out.println(msg);
+            out.flush();
             System.out.println("server>" + msg);
         } catch (Exception ioException) {
             ioException.printStackTrace();
