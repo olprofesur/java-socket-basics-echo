@@ -4,28 +4,6 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class Command {
-    private String commandName;
-    private int par1;
-
-    public String getCommandName() {
-        return commandName;
-    }
-
-    public int getPar1() {
-        return par1;
-    }
-
-    public void setCommandName(String commandName) {
-        this.commandName = commandName;
-    }
-
-    public void setPar1(int par1) {
-        this.par1 = par1;
-    }
-}
-
-
 public class Server_json {
 
     private ServerSocket providerSocket;
@@ -43,7 +21,7 @@ public class Server_json {
             //1. creating a server socket
             providerSocket = new ServerSocket(9999, 10);
             //2. Wait for connection
-            System.out.println("Waiting for connection");
+            System.out.println("Server json, waiting for connection");
             connection = providerSocket.accept();
             System.out.println("Connection received from " + connection.getInetAddress().getHostName());
             //3. get Input and Output streams
