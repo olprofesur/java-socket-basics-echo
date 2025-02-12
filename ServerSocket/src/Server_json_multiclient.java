@@ -20,7 +20,7 @@ public class Server_json_multiclient {
             //1. creating a server socket
             providerSocket = new ServerSocket(9999, 10);
             //2. Wait for connection
-            System.out.println("Server mjson ulticlient, waiting for connection");
+            System.out.println("Server json multiclient, waiting for connection");
             Socket connection = providerSocket.accept();
             System.out.println("Connection received from " + connection.getInetAddress().getHostName());
             System.out.println("Starting a new thread for serving it");
@@ -41,7 +41,7 @@ public class Server_json_multiclient {
 
 
     public static void main(String args[]) {
-        Server_json server = new Server_json();
+        Server_json_multiclient server = new Server_json_multiclient();
         while (true) {
             server.run();
         }
@@ -65,7 +65,7 @@ class ClientManager extends Thread {
             PrintWriter pw = new PrintWriter(out);
             pw.println(msg);
             pw.flush();
-            System.out.println("server>" + msg);
+            System.out.println("server-client manager" + msg);
         } catch (Exception ioException) {
             ioException.printStackTrace();
         }
@@ -86,6 +86,8 @@ class ClientManager extends Thread {
                 try {
                     String message=in.readLine();
                     objClient = mapper.readValue(message, Command.class);
+                    //simulation of an elaboration
+                    sleep(10000);
                     System.out.println("client>" + objClient.getCommandName());
                     if (objClient.getCommandName().equals("bye")) {
                         sendMessage(mapper.writeValueAsString(objClient));
