@@ -25,7 +25,8 @@ public class Server_json_multiclient {
             System.out.println("Connection received from " + connection.getInetAddress().getHostName());
             System.out.println("Starting a new thread for serving it");
             ClientManager cm=new ClientManager(connection);
-            cm.start();
+            Thread t=new Thread(cm);
+            t.start();
 
         } catch (IOException ioException) {
             ioException.printStackTrace();
@@ -49,7 +50,7 @@ public class Server_json_multiclient {
 
 }
 
-class ClientManager extends Thread {
+class ClientManager implements Runnable {
     Socket clientSocket;
     private PrintWriter out;
     private BufferedReader in;
@@ -87,7 +88,7 @@ class ClientManager extends Thread {
                     String message=in.readLine();
                     objClient = mapper.readValue(message, Command.class);
                     //simulation of an elaboration
-                    sleep(10000);
+                    Thread.sleep(10000);
                     System.out.println("client>" + objClient.getCommandName());
                     if (objClient.getCommandName().equals("bye")) {
                         sendMessage(mapper.writeValueAsString(objClient));
