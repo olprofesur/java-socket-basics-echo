@@ -19,14 +19,17 @@ public class Server_json_multiclient {
         try {
             //1. creating a server socket
             providerSocket = new ServerSocket(9999, 10);
-            //2. Wait for connection
-            System.out.println("Server json multiclient, waiting for connection");
-            Socket connection = providerSocket.accept();
-            System.out.println("Connection received from " + connection.getInetAddress().getHostName());
-            System.out.println("Starting a new thread for serving it");
-            ClientManager cm=new ClientManager(connection);
-            Thread t=new Thread(cm);
-            t.start();
+
+            while (true) {
+                //2. Wait for connection
+                System.out.println("Server json multiclient, waiting for connection");
+                Socket connection = providerSocket.accept();
+                System.out.println("Connection received from " + connection.getInetAddress().getHostName());
+                System.out.println("Starting a new thread for serving it");
+                ClientManager cm = new ClientManager(connection);
+                Thread t = new Thread(cm);
+                t.start();
+            }
 
         } catch (IOException ioException) {
             ioException.printStackTrace();
@@ -43,9 +46,8 @@ public class Server_json_multiclient {
 
     public static void main(String args[]) {
         Server_json_multiclient server = new Server_json_multiclient();
-        while (true) {
-            server.run();
-        }
+        server.run();
+
     }
 
 }
